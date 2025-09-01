@@ -1,4 +1,8 @@
 from urlextract import URLExtract
+from wordcloud import WordCloud
+import pandas as pd
+from collections import Counter
+import emoji
 
 extract = URLExtract()
 
@@ -22,3 +26,54 @@ def stats(selected_user, df):
     return num_messages, len(words), num_media_messages, len(links) 
    
 # return no of messages, no of words, no of media messages, no of links
+  
+def most_busy_users(df):
+    x = df['user'].value_counts().head()
+    df= round((df['user'].value_counts()/df.shape[0])*100,2).reset_index().rename(columns={'index': 'name', 'user': 'percent'})
+    return x, df
+
+def create_wordcloud(selected_user, df):
+
+    if selected_user != 'Overall':
+     df = df[df['user'] == selected_user]
+
+    wc = WordCloud(width=500, height=500, min_font_size=10, background_color='white')
+    df_wc = wc.generate(df['message'].str.cat(sep=" "))
+    return df_wc
+
+def emojis(selected_user, df):
+   
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+
+    emojis_list = []
+
+    for mess in df['message']:
+        emojis_list.extend([c for c in mess if emoji.is_emoji(c)])
+
+    emoji_df = pd.DataFrame(Counter(emojis_list).most_common(len(Counter(emojis_list))),
+                            columns=['emoji', 'count'])
+    return emoji_df
+
+def monthly_timeline(selected_user, df):
+
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+
+    df['month_name'] = df['date'].dt.month_name()
+
+    timeline = df.groupby(['year','month_name']).count()['message'].reset_index()
+
+    time = []
+    for i in range(timeline.shape[0]):
+     time.append(str(timeline['month_name'][i]) + " " + str(timeline['year'][i]))
+
+    timeline['time'] = time
+
+    return timeline
+
+
+
+   
+   
+
