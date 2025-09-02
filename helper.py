@@ -87,7 +87,7 @@ def month_map(selected_user, df):
         return None   
 
     monthly_timeline = df.groupby(['month', 'month_name']).count()['message'].reset_index()
-    monthly_timeline = monthly_timeline.sort_values('month')  # ensure Jan → Dec order
+    monthly_timeline = monthly_timeline.sort_values('month') 
 
     return monthly_timeline
 
