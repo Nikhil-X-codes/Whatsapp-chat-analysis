@@ -41,5 +41,23 @@ def pre(data):
     
     # Reset index after filtering
     df = df.reset_index(drop=True)
+
+    df['month_name'] = df['date'].dt.month_name()
+    df["hour"] = df["date"].dt.hour
+    df["minute"] = df["date"].dt.minute
+    df["only_date"] = df["date"].dt.date  
+    df["day_name"] = df["date"].dt.day_name()
+
+    period=[]
+
+    for hour in df[['day_name','hour']]['hour']:
+      if hour == 23:
+        period.append(str(hour)+ "-" + str("00"))
+      elif hour == 0:
+        period.append(str("0")+ "-" + str(hour+1))
+      else:
+        period.append(str(hour)+ "-" + str(hour+1))
+
+    df['period'] = period
     
     return df

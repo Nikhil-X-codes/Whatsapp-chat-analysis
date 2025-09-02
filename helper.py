@@ -60,8 +60,6 @@ def monthly_timeline(selected_user, df):
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
 
-    df['month_name'] = df['date'].dt.month_name()
-
     timeline = df.groupby(['year','month_name']).count()['message'].reset_index()
 
     time = []
@@ -71,6 +69,38 @@ def monthly_timeline(selected_user, df):
     timeline['time'] = time
 
     return timeline
+
+def weekly_timeline(selected_user, df):
+   
+    if selected_user != 'Overall':
+      df = df[df['user'] == selected_user]
+
+    weekline = df.groupby('day_name').count()['message'].reset_index()
+
+    return weekline
+
+def month_map(selected_user, df):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+
+    if df.empty:
+        return None   
+
+    monthly_timeline = df.groupby(['month', 'month_name']).count()['message'].reset_index()
+    monthly_timeline = monthly_timeline.sort_values('month')  # ensure Jan → Dec order
+
+    return monthly_timeline
+
+
+def day_map(selected_user, df):
+    
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+
+    user_heatmap = df.pivot_table(index='day_name', columns='period', values='message', aggfunc='count').fillna(0)
+
+    return user_heatmap
+
 
 
 
